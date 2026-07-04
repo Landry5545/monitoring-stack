@@ -1,0 +1,15 @@
+name: Deploy Monitoring Stack
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - name: pull latest and redeploy
+        run: |
+          cd /home/landry5545/monitoring-stack
+          git pull origin main
+          docker compose up -d --build
