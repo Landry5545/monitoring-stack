@@ -78,7 +78,6 @@ With config, firewall, and kernel forwarding all ruled out, the most likely rema
 **Takeaway:** when several theoretically-correct fixes fail in exactly the same way, that's usually a sign the layer you're debugging isn't the one that's actually broken. Pivoting to a different architecture (containerize the exporter) cost less time than continuing to chase the routing issue, and is also just a legitimate, common pattern in real Docker monitoring setups.
 
 ## Repo structure
-
 monitoring-stack/
 ├── docker-compose.yml
 ├── prometheus/
