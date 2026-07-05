@@ -1,4 +1,5 @@
 Monitoring Stack with CI/CD Pipeline
+![Architecture diagram](images/architecture-diagram.png)
 Overview
 A production-style monitoring infrastructure built on an Ubuntu Server VM, featuring automated deployment via a self-hosted GitHub Actions CI/CD pipeline.
 Why Self-Hosted Runner
