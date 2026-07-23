@@ -1,5 +1,13 @@
 # Monitoring Stack with CI/CD Pipeline
 
+## Network Topology
+
+This project builds on the shared lab network topology established in
+[linux-networking-lab](https://github.com/Landry5545/linux-networking-lab#network-topology).
+`server-vm` and `client-vm` communicate over the internal `labnet`
+network, with NAT adapters providing internet access independently on
+each VM.
+
 ![Architecture diagram](images/architecture-diagram.png)
 
 ## CI/CD Pipeline (Project 6)
