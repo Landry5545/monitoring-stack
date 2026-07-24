@@ -149,3 +149,15 @@ graph TD
 2. Promtail binary download 404s across multiple release tags — resolved by containerizing Promtail instead, since standalone binary distribution is being phased out.
 3. Grafana UI inaccessible from Windows host via `labnet` IP — resolved using `server-vm`'s existing NAT port-forwarding rule (`localhost:3000`).
 4. Loki data source added via Grafana API (`curl` POST to `/api/datasources`) rather than the UI, since `server-vm` has no confirmed browser.
+
+### Verification
+
+- `docker compose ps` on `server-vm` shows all 6 containers (`cadvisor`, `grafana`, `loki`, `node-exporter`, `prometheus`, `promtail`) running.
+- Grafana Explore, querying `{job="syslog"}` and `{job="syslog", host="client-vm"}`, returns live log streams from both hosts with a log-volume histogram broken down by level.
+
+### Next Steps
+
+- Nginx SSL/TLS
+- WireGuard VPN
+- Active Directory on Windows Server
+- Consider migrating Promtail to Grafana Alloy in a future project, since Alloy is the actively maintained successor and a more current skill to demonstrate.
