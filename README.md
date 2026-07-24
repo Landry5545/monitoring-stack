@@ -93,3 +93,59 @@ monitoring-stack/
 ├── images/
 │   └── architecture-diagram.png
 └── README.md
+
+## Project 9: Centralized Logging with Loki + Promtail
+
+Centralized log aggregation added to the monitoring stack. Loki collects logs from both lab VMs via Promtail agents, queryable directly in Grafana alongside metrics.
+
+### Architecture
+
+```mermaid
+graph TD
+    subgraph server-vm [server-vm - 10.10.10.10]
+        Loki[Loki<br/>Docker container<br/>:3100]
+        Grafana[Grafana<br/>Docker container<br/>:3000]
+        PromtailServer[Promtail<br/>Docker container]
+        Prometheus[Prometheus<br/>:9090]
+        SyslogServer[/var/log/syslog/]
+        DockerLogs[Docker container logs]
+    end
+
+    subgraph client-vm [client-vm - 10.10.10.20]
+        PromtailClient[Promtail<br/>Docker container]
+        SyslogClient[/var/log/syslog<br/>/var/log/auth.log/]
+    end
+
+    SyslogServer --> PromtailServer
+    DockerLogs --> PromtailServer
+    PromtailServer -->|push| Loki
+
+    SyslogClient --> PromtailClient
+    PromtailClient -->|push over labnet| Loki
+
+    Loki -->|data source| Grafana
+    Prometheus -->|data source| Grafana
+```
+
+### Components
+
+| Component | Location | Role |
+|---|---|---|
+| Loki | server-vm (Docker) | Log aggregation and storage |
+| Promtail (server) | server-vm (Docker) | Ships syslog + Docker container logs |
+| Promtail (client) | client-vm (Docker) | Ships syslog + auth.log over `labnet` |
+| Grafana | server-vm (Docker) | Unified query UI for logs (Loki) + metrics (Prometheus) |
+
+### Key Decisions
+
+- Promtail runs via Docker on both VMs rather than as a native binary. Grafana has deprecated standalone Promtail binary releases in favor of Grafana Alloy, so the Docker image was the reliable path for both hosts.
+- `client-vm` required a new Docker installation to support this.
+- Loki uses filesystem storage with a 7-day retention period.
+- `client-vm`'s Promtail pushes to Loki over `labnet` at `10.10.10.10:3100`.
+
+### Issues Resolved
+
+1. YAML indentation break in `docker-compose.yml` when pasting new service blocks via GitHub's web editor — fixed with explicit 2-space indentation matching existing services.
+2. Promtail binary download 404s across multiple release tags — resolved by containerizing Promtail instead, since standalone binary distribution is being phased out.
+3. Grafana UI inaccessible from Windows host via `labnet` IP — resolved using `server-vm`'s existing NAT port-forwarding rule (`localhost:3000`).
+4. Loki data source added via Grafana API (`curl` POST to `/api/datasources`) rather than the UI, since `server-vm` has no confirmed browser.
